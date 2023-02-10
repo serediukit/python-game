@@ -66,9 +66,7 @@ class Level:
         self.current_attack = None
 
     def create_magic(self, style, strength, cost):
-        print(style)
-        print(strength)
-        print(cost)
+        pass
 
     def destroy_magic(self):
         pass
