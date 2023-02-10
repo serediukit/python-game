@@ -16,6 +16,11 @@ class UI:
             weapon = pygame.image.load(path).convert_alpha()
             self.weapon_graphics.append(weapon)
 
+        self.magic_graphics = []
+        for magics in magic_data.values():
+            path = magics['graphic']
+            magic = pygame.image.load(path).convert_alpha()
+            self.magic_graphics.append(magic)
 
     def show_bar(self, current, max, bg_rect, color):
         pygame.draw.rect(self.display_surface, UI_BG_COLOR, bg_rect)
@@ -61,6 +66,22 @@ class UI:
         pygame.draw.rect(self.display_surface, UI_BORDER_COLOR_ACTIVE, bg_rect[weapon_index], 5)
         pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, active_rect, 2)
 
+    def magic_overlay(self, magic_index):
+        bg_rect = []
+
+        for i in range(2):
+            bg_rect.append(self.selection_box(10 + 90 * i, 520))
+            magic_surf = self.magic_graphics[i]
+            magic_rect = magic_surf.get_rect(center = bg_rect[i].center)
+            self.display_surface.blit(magic_surf, magic_rect)
+
+        active_rect = bg_rect[magic_index].copy()
+        active_rect.width += 4
+        active_rect.height += 4
+        active_rect.center = bg_rect[magic_index].center
+        pygame.draw.rect(self.display_surface, UI_BORDER_COLOR_ACTIVE, bg_rect[magic_index], 5)
+        pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, active_rect, 2)
+
     def display(self, player):
         self.show_bar(player.health, player.stats['health'], self.health_bar_rect, HEALTH_COLOR)
         self.show_bar(player.energy, player.stats['energy'], self.energy_bar_rect, ENERGY_COLOR)
@@ -68,4 +89,4 @@ class UI:
         self.show_exp(player.exp)
 
         self.weapon_overlay(player.weapon_index)
-        self.selection_box(10, 520)
+        self.magic_overlay(player.magic_index)
