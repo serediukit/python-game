@@ -6,7 +6,8 @@ HITBOX_OFFSET = {
     'player': -26,
     'object': -70,
     'grass': -10,
-    'invisible': 0}
+    'invisible': 0
+}
 
 BAR_HEIGHT = 20
 HEALTH_BAR_WIDTH = 200

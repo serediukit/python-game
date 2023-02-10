@@ -6,6 +6,7 @@ from support import *
 from random import choice
 from weapon import Weapon
 from ui import UI
+from enemy import Enemy
 
 class Level:
     def __init__(self):
@@ -24,7 +25,8 @@ class Level:
         layouts = {
             'boundary': import_csv_layout('../map/map_FloorBlocks.csv'),
             'grass': import_csv_layout('../map/map_Grass.csv'),
-            'object': import_csv_layout('../map/map_Objects.csv')
+            'object': import_csv_layout('../map/map_Objects.csv'),
+            'entities': import_csv_layout('../map/map_Entities.csv')
         }
         graphics = {
             'grass': import_folder('../graphics/grass'),
@@ -46,16 +48,29 @@ class Level:
                         elif style == 'object':
                             surf = graphics['objects'][int(col)]
                             Tile((x,y), [self.vissible_sprites, self.obstacle_sprites], 'object', surf)
+                        elif style == 'entities':
+                            if col == '394':
+                                self.player = Player(
+                                    (x, y),
+                                    [self.vissible_sprites],
+                                    self.obstacle_sprites,
+                                    self.create_attack,
+                                    self.destroy_attack,
+                                    self.create_magic,
+                                    self.destroy_magic
+                                )
+                            else:
+                                if col == '390':
+                                    monster_name = 'bamboo'
+                                elif col == '391':
+                                    monster_name = 'spirit'
+                                elif col == '392':
+                                    monster_name = 'raccoon'
+                                else:
+                                    monster_name = 'squid'
+                                Enemy(monster_name, (x, y), [self.vissible_sprites], self.obstacle_sprites)
 
-        self.player = Player(
-            (2000,1430),
-            [self.vissible_sprites],
-            self.obstacle_sprites,
-            self.create_attack,
-            self.destroy_attack,
-            self.create_magic,
-            self.destroy_magic
-        )
+
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.vissible_sprites])
@@ -74,6 +89,7 @@ class Level:
     def run(self):
         self.vissible_sprites.custom_draw(self.player)
         self.vissible_sprites.update()
+        self.vissible_sprites.enemy_update(self.player)
         self.ui.display(self.player)
 
 class YSortCameraGroup(pygame.sprite.Group):
@@ -97,3 +113,8 @@ class YSortCameraGroup(pygame.sprite.Group):
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
             self.display_surface.blit(sprite.image, offset_pos)
+
+    def enemy_update(self, player):
+        enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
+        for sprite in enemy_sprites:
+            sprite.enemy_update(player)
